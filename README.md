@@ -42,34 +42,29 @@ Save the trained model, visualize predictions, and integrate it into an applicat
 class CNNClassifier(nn.Module):
     def __init__(self):
         super(CNNClassifier, self).__init__()
+        self.conv1 = nn.Conv2d(1, 32, kernel_size=3, padding=1)
+        self.conv2 = nn.Conv2d(32, 64, kernel_size=3, padding=1)
+        self.pool = nn.MaxPool2d(2, 2)
+        self.fc1 = nn.Linear(64 * 7 * 7, 128)
+        self.fc2 = nn.Linear(128, 10)
 
-        self.conv1 = nn.Conv2d(1,32,3,padding=1)
-        self.conv2 = nn.Conv2d(32,64,3,padding=1)
-        self.conv3 = nn.Conv2d(64,128,3,padding=1)
-
-        self.pool = nn.MaxPool2d(2,2)
-
-        self.fc1 = nn.Linear(128*3*3,128)
-        self.fc2 = nn.Linear(128,64)
-        self.fc3 = nn.Linear(64,10)
-
-    def forward(self,x):
-        x=self.pool(torch.relu(self.conv1(x)))
-        x=self.pool(torch.relu(self.conv2(x)))
-        x=self.pool(torch.relu(self.conv3(x)))
-        x=x.view(x.size(0),-1)
-        x=torch.relu(self.fc1(x))
-        x=torch.relu(self.fc2(x))
-        x=self.fc3(x)
+    def forward(self, x):
+        x = self.pool(torch.relu(self.conv1(x)))
+        x = self.pool(torch.relu(self.conv2(x)))
+        x = x.view(x.size(0), -1)
+        x = torch.relu(self.fc1(x))
+        x = self.fc2(x)
         return x
-
-
 
 
 ```
 
 ```python
 model = CNNClassifier()
+
+device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+model.to(device)
+
 criterion = nn.CrossEntropyLoss()
 optimizer = optim.Adam(model.parameters(), lr=0.001)
 
@@ -77,19 +72,15 @@ optimizer = optim.Adam(model.parameters(), lr=0.001)
 ```
 
 ```python
-device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-model = model.to(device)
-
 def train_model(model, train_loader, num_epochs=3):
-
     model.train()
 
     for epoch in range(num_epochs):
         running_loss = 0.0
 
         for images, labels in train_loader:
-
-            images, labels = images.to(device), labels.to(device)
+            images = images.to(device)
+            labels = labels.to(device)
 
             optimizer.zero_grad()
 
@@ -101,30 +92,34 @@ def train_model(model, train_loader, num_epochs=3):
 
             running_loss += loss.item()
 
-        print(f"Epoch [{epoch+1}/{num_epochs}], Loss: {running_loss/len(train_loader):.4f}")
-train_model(model, train_loader, num_epochs=3)
+        print('Name: Selvarani S')
+        print('Register Number: 212224040301')
+        print(f'Epoch [{epoch+1}/{num_epochs}], Loss: {running_loss/len(train_loader):.4f}')
 
 ```
 
 ## OUTPUT
 ### Training Loss per Epoch
 
-<img width="828" height="101" alt="image" src="https://github.com/user-attachments/assets/75d89b63-0560-4f34-a806-48c15cc2be3c" />
+<img width="485" height="226" alt="image" src="https://github.com/user-attachments/assets/e01a8c7c-d3be-4f45-9e18-fdf09f1aa170" />
+
 
 
 ### Confusion Matrix
 
-<img width="814" height="645" alt="image" src="https://github.com/user-attachments/assets/35fb73b3-be48-45c3-a150-22f34b597cc6" />
+<img width="727" height="632" alt="image" src="https://github.com/user-attachments/assets/15566135-0763-4e63-aaa8-e6066822c7c7" />
+
 
 
 ### Classification Report
-<img width="671" height="226" alt="image" src="https://github.com/user-attachments/assets/a6944b5e-4efd-47d0-a570-0fd4d3c1ad31" />
+<img width="754" height="484" alt="image" src="https://github.com/user-attachments/assets/ff64c10e-0cdb-4290-9648-6a1c70738186" />
+
 
 
 
 ### New Sample Data Prediction
 
-<img width="656" height="592" alt="image" src="https://github.com/user-attachments/assets/e7a9e083-04cf-412d-b66d-0648b7378041" />
+<img width="793" height="712" alt="image" src="https://github.com/user-attachments/assets/d4c4ba77-dd8b-4968-bc7e-6da5e385fd50" />
 
 
 ## RESULT
